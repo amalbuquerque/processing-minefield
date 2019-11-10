@@ -8,18 +8,33 @@ void setup() {
   size(1000, 1000);
 }
 
+static float blue_background = 120;
+
 void draw() {
-  background(t % 255);
+
+  blue_background = random_color(blue_background, 10, 255);
+
+  background(
+      255,
+      200,
+      blue_background
+  );
+
   strokeWeight(3);
 
   translate(width/2, height/2);
 
-  for (int i = 0; i < NUM_LINES; i++) {
-    stroke((t + i)%255, (t-i)%255, (t-i)%255);
+  float red_stroke = random_color(20, 10, 255);
+  stroke(red_stroke, 100, 100);
 
+  for (int i = 0; i < NUM_LINES; i++) {
     line(x1(t+i), y1(t+i), x2(t+i), y2(t+i));
   }
-  t+= 0.2;
+  t+= 0.1;
+}
+
+float random_color(float base, float amplitude, int max) {
+  return (base + noise(t)*sin(t)*amplitude) % max;
 }
 
 float x1(float t) {
