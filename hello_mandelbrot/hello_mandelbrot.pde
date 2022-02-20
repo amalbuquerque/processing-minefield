@@ -4,51 +4,61 @@ int multiplier = 500;
 float mandelbrot_x_start = -2;
 float mandelbrot_x_end = 0.47;
 
-float mandelbroat_x_length = mandelbrot_x_end - mandelbrot_x_start;
+float mandelbrot_x_length = mandelbrot_x_end - mandelbrot_x_start;
 
-int screen_width = int(mandelbroat_x_length * multiplier);
+int screen_width = int(mandelbrot_x_length * multiplier);
 
 // y goes from [-1.12; 1.12]
 float mandelbrot_y_start = -1.12;
 float mandelbrot_y_end = 1.12;
 
-float mandelbroat_y_length = mandelbrot_y_end - mandelbrot_y_start;
+float mandelbrot_y_length = mandelbrot_y_end - mandelbrot_y_start;
 
-int screen_height = int(mandelbroat_y_length * multiplier);
+int screen_height = int(mandelbrot_y_length * multiplier);
 
-// if it passes over 255 = max color value, it becomes white?!
-int max_iteration = 200;
+// if it passes over 255, it starts becoming uglier
+int max_iteration = 250;
+int max_iteration_step = 10;
+
+int max_color = 220;
 
 color grey = color(128, 128, 128);
 color black = color(0, 0, 0);
 
 color[] create_palette(int max_iteration) {
-  color[] palette = new color[max_iteration];
+
+  color[] to_return = new color[max_iteration];
+
+  float step_size = float(max_color)/max_iteration;
+  println("Step size: " + step_size);
+
   for (int i=0; i < max_iteration; i++) {
-    float current = (i*255)/max_iteration;
+    float current = i*step_size;
 
-    current = max_iteration - current;
+    current = max_color - current;
 
-    palette[i] = color(current, current, current);
+    to_return[i] = color(current, current, current);
   }
 
-  println("First palette color: " + hex(palette[0]));
-  println("Last palette color (" + max_iteration + "): " + hex(palette[max_iteration - 1]));
+  println("First palette color: " + hex(to_return[0]));
+  println("Last palette color (" + max_iteration + "): " + hex(to_return[max_iteration - 1]));
 
-  return palette;
+  return to_return;
 }
 
 color[] palette = create_palette(max_iteration);
 
 float scale_x_screen_coordinate(int pixel_x_coord) {
-  return mandelbrot_x_start + (pixel_x_coord * mandelbroat_x_length)/screen_width;
+  return mandelbrot_x_start + (pixel_x_coord * mandelbrot_x_length)/screen_width;
 }
 
 float scale_y_screen_coordinate(int pixel_y_coord) {
-  return mandelbrot_y_start + (pixel_y_coord * mandelbroat_y_length)/screen_width;
+  return mandelbrot_y_start + (pixel_y_coord * mandelbrot_y_length)/screen_width;
 }
 
-void mandelbrot() {
+void mandelbrot(int current_max_iteration) {
+  println("Mandelbrot with max_iteration: " + current_max_iteration);
+
   for (int i = 0; i < width; i++) {
     for (int j = 0; j < height; j++) {
       // scaled x coordinate of pixel (on the Mandelbrot X scale)
@@ -62,7 +72,7 @@ void mandelbrot() {
 
       int iteration = 0;
 
-      while((x*x + y*y <= 2*2) && (iteration < max_iteration)) {
+      while((x*x + y*y <= 2*2) && (iteration < current_max_iteration)) {
         float x_temp = x*x - y*y + x0;
         y = 2*x*y + y0;
         x = x_temp;
@@ -84,10 +94,17 @@ void settings() {
 }
 
 void setup() {
-  background(black);
+  background(grey);
 }
 
+int current_max_iteration = max_iteration_step;
+
 void draw() {
-  mandelbrot();
-  noLoop();
+  mandelbrot(current_max_iteration);
+
+  if(current_max_iteration >= max_iteration) {
+    noLoop();
+  }
+
+  current_max_iteration = current_max_iteration + max_iteration_step;
 }
