@@ -20,24 +20,29 @@ int screen_height = int(mandelbrot_y_length * multiplier);
 int max_iteration = 250;
 int max_iteration_step = 10;
 
-int max_color = 220;
+// https://processing.org/reference/lerpColor_.html
+// amt goes from 0 to 1
+int max_lerp_color_amt = 1;
 
 color grey = color(128, 128, 128);
 color black = color(0, 0, 0);
 
+color orange = color(204, 102, 0);
+color blue = color(0, 102, 153);
+
 color[] create_palette(int max_iteration) {
+  color from = orange;
+  color to = blue;
 
   color[] to_return = new color[max_iteration];
 
-  float step_size = float(max_color)/max_iteration;
-  println("Step size: " + step_size);
+  float step_size = float(max_lerp_color_amt)/max_iteration;
+  println("Palette step size: " + step_size);
 
   for (int i=0; i < max_iteration; i++) {
     float current = i*step_size;
 
-    current = max_color - current;
-
-    to_return[i] = color(current, current, current);
+    to_return[i] = lerpColor(from, to, current);
   }
 
   println("First palette color: " + hex(to_return[0]));
